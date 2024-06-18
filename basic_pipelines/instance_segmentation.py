@@ -84,7 +84,7 @@ def app_callback(pad, info, user_data):
                     string_to_print += f"Base coordinates ({int(bbox.xmin() * width)},{int(bbox.ymin() * height)})\n"
     
     if user_data.get_count() % 10 == 0:
-        string_to_print += (f"FPS: {user_data.fps:.1f}\n")
+        string_to_print += (f"\nFPS: {user_data.fps:.1f}\n")
 
     print(string_to_print)
     return Gst.PadProbeReturn.OK
