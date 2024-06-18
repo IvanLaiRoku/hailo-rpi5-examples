@@ -12,6 +12,7 @@ import time
 import hailo
 from hailo_common_funcs import get_numpy_from_buffer, disable_qos
 from hailo_rpi_common import get_default_parser, QUEUE, get_caps_from_pad, GStreamerApp, app_callback_class
+import time
 
 # -----------------------------------------------------------------------------------------------
 # User defined class to be used in the callback function
@@ -42,6 +43,7 @@ def app_callback(pad, info, user_data):
         
     # using the user_data to count the number of frames
     user_data.increment()
+    user_data.get_fps()
     string_to_print = f"Frame count: {user_data.get_count()}\n"
     
     # Get the caps from the pad
@@ -64,7 +66,7 @@ def app_callback(pad, info, user_data):
         bbox = detection.get_bbox()
         confidence = detection.get_confidence()
         if label == "person":
-            string_to_print += (f"Detection: {label} {confidence:.2f}\n")
+            string_to_print += (f"Detection: {label} {confidence:.2f}")
             detection_count += 1
     if user_data.use_frame:
         # Note: using imshow will not work here, as the callback function is not running in the main thread
@@ -76,6 +78,11 @@ def app_callback(pad, info, user_data):
         # Convert the frame to BGR
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         user_data.set_frame(frame)
+
+    if user_data.get_count() % 10 == 0:
+        string_to_print += (f"FPS: {user_data.fps:.1f}")
+
+    string_to_print += "\n"
 
     print(string_to_print)
     return Gst.PadProbeReturn.OK
@@ -123,7 +130,8 @@ class GStreamerDetectionApp(GStreamerApp):
 
     def get_pipeline_string(self):
         if (self.source_type == "rpi"):
-            source_element = f"libcamerasrc name=src_0 auto-focus-mode=2 ! "
+            # source_element = f"libcamerasrc name=src_0 auto-focus-mode=2 ! "  # auto-focus-mode=2 is for continuous focus
+            source_element = f"libcamerasrc name=src_0 auto-focus-mode=0 ! "  # auto-focus-mode=0 is for manual focus
             source_element += f"video/x-raw, format={self.network_format}, width=1536, height=864 ! "
             source_element += QUEUE("queue_src_scale")
             source_element += f"videoscale ! "

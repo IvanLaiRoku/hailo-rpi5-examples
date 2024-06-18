@@ -31,6 +31,14 @@ class app_callback_class:
         self.use_frame = False
         self.frame_queue = multiprocessing.Queue(maxsize=3)
         self.running = True
+        self.t0 = time.time()
+        self.fps = 0
+
+    def get_fps(self):
+        if self.frame_count % 10 == 9:
+            t1 = time.time()
+            self.fps = 10 / (t1 - self.t0)
+            self.t0 = t1
 
     def increment(self):
         self.frame_count += 1
