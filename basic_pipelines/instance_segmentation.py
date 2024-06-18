@@ -42,6 +42,7 @@ def app_callback(pad, info, user_data):
         
     # using the user_data to count the number of frames
     user_data.increment()
+    user_data.get_fps()
     string_to_print = f"Frame count: {user_data.get_count()}\n"
     
     # Get the caps from the pad
@@ -82,6 +83,9 @@ def app_callback(pad, info, user_data):
                     string_to_print += f"Mask shape: {data.shape}, "
                     string_to_print += f"Base coordinates ({int(bbox.xmin() * width)},{int(bbox.ymin() * height)})\n"
     
+    if user_data.get_count() % 10 == 0:
+        string_to_print += (f"FPS: {user_data.fps:.1f}\n")
+
     print(string_to_print)
     return Gst.PadProbeReturn.OK
     
