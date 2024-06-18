@@ -66,7 +66,7 @@ def app_callback(pad, info, user_data):
         bbox = detection.get_bbox()
         confidence = detection.get_confidence()
         if label == "person":
-            string_to_print += (f"Detection: {label} {confidence:.2f}")
+            string_to_print += (f"Detection: {label} {confidence:.2f}\n")
             detection_count += 1
     if user_data.use_frame:
         # Note: using imshow will not work here, as the callback function is not running in the main thread
@@ -80,9 +80,7 @@ def app_callback(pad, info, user_data):
         user_data.set_frame(frame)
 
     if user_data.get_count() % 10 == 0:
-        string_to_print += (f"FPS: {user_data.fps:.1f}")
-
-    string_to_print += "\n"
+        string_to_print += (f"FPS: {user_data.fps:.1f}\n")
 
     print(string_to_print)
     return Gst.PadProbeReturn.OK
